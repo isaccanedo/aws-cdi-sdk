@@ -318,10 +318,6 @@ sudo iptables -L
 
 On Windows launch the **Windows Defender Firewall** application to control the firewall settings. See [Allow test applications in Windows firewall](./INSTALL_GUIDE_WINDOWS.md#allow-test-applications-in-windows-firewall) for specific instructions.
 
-# Security
-
-See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
-
 # Licensing
 
 This library is licensed under the BSD-2-Clause license. See [LICENSE](LICENSE) for more details.
