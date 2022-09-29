@@ -1,0 +1,6 @@
+VERS_2.4 {
+    global:
+        Cdi*;
+    local:
+        *;
+};

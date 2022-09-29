@@ -1,0 +1,246 @@
+-------------------------------------------------------------------------------------------
+Copyright Amazon.com Inc. or its affiliates. All Rights Reserved.
+This file is part of the AWS CDI-SDK, licensed under the BSD 2-Clause "Simplified" License.
+License details at: https://github.com/aws/aws-cdi-sdk/blob/mainline/LICENSE
+-------------------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------
+CDI (Cloud Digital Interface) SDK Version 2.4.0 - 04/22/22
+---------------------------------------------------------------------------
+
+What's New
+------------
+* Created discussion pages on GitHub CDI-SDK site at https://github.com/aws/aws-cdi-sdk/discussions. Please start using
+  so the whole community can benefit.
+* Added additional test content at https://cdi.elemental.com/test_content/index.html
+* Added new API for processing ancillary data payloads.
+* Added a new check for ancillary data payloads to cdi_test. When using the "--riff" option, cdi_test will check that
+  received payloads are formatted according to the CDI Baseline Profile format specification at
+  https://cdi.elemental.com/specs/baseline-ancillary-data.
+* Added command line tool 'dump_riff' for inspecting RIFF file content.
+* Added kCdiStatusInvalidPayload to enum called CdiReturnStatus in cdi_core_api.h.
+* Removed empty/unused functions CdiPoolGetBulk and CdiPoolPutBulk.
+* Improved error reporting in os_linux.c.
+* Added documentation about thread-pinning the poll threads.
+* Rx buffers used in adapters are limited to the size defined within the libfabric provider. For the libfabric socket
+  provider the limit is 376 adapter packets, which limits the maximum payload size to approximately 3,340,000 bytes. See
+  logic concerning packet_count in CreatePacketPool(), adapter_efa_rx.c. The version of libfabric being used contains a
+  memory leak if this limit is not enforced. The leak has been fixed in a later version of libfabric (see details at
+  https://github.com/ofiwg/libfabric/pull/7145). The next major release of the CDI-SDK will use the newer version of
+  libfabric.
+
+Bug Fixes
+------------
+* Fixed a bug in the payload packetizer. The bug caused undefined data in linear receive buffers (buffer type LINEAR).
+* Added locking around certain calls to libfabric APIs. Without the locks cdi_test with adapter type SOCKETS_LIBFABIC
+  may sometimes fail because of race conditions in libfabric.
+* Fixed a bug in the Endpoint Manager. The bug caused CdiAvmStreamEndpointDestroy in cdi_avm_api.c to hang without
+  active data transfer.
+* Fixed a bug that prevented creation of multiple CDI endpoints with the SOCKETS_LIBFABRIC adapter.
+* Fixes/changes to the cdi_test application:
+  * Fixed buffer overflow when writing received payloads to a file.
+  * Skip unexpected payloads received.
+  * Fixed console logger issues with shutdown and multi-threaded use.
+* Fixed timing issue as part of adapter connection setup. See changes in adapter.c.
+* Fixed segfault in adapter when freeing Rx buffers. See changes in RxEnqueueFreeBuffer in internal_rx.c.
+* Fixed some problems in adapter Tx's GetCompletions in adapter_efa_tx.c.
+* Fixed GitHub Issue #67. See https://github.com/aws/aws-cdi-sdk/issues/67
+
+CDI (Cloud Digital Interface) SDK Version 2.3.2 - 11/29/21
+---------------------------------------------------------------------------
+
+Bug Fixes
+------------
+* Fixed problem that was introduced in SDK 2.3.1, which prevented previous versions of SDK transmitters from connecting
+  to version 2.3.1.
+
+---------------------------------------------------------------------------
+CDI (Cloud Digital Interface) SDK Version 2.3.1 - 10/29/21
+---------------------------------------------------------------------------
+
+What's New
+------------
+* Added new logger macros CDI_LOG_WHEN() and CDI_LOG_THREAD_WHEN() that provide log message filtering and occurrence
+  count logic.
+* Added new command line options to the cdi_test application that disables validation of received payload user data.
+  This should be used when the cdi_test application is receiving payloads sent by applications other than cdi_test. See
+  "-nopud" or "--no_payload_user_data".
+* Renamed macro THREAD to CDI_THREAD in cdi_os_api.h.
+* Moved "#ifdef __cplusplus" usage from public API header files to be part of the CDI_INTERFACE define.
+* Added a new API CdiAvmValidateBaselineVersionString.
+
+Bug Fixes
+------------
+* Fixed a bug in the CDI receiver code for linear buffers (buffer type LINEAR). The bug caused CDI applications
+  receiving data in linear buffer mode to generate error messages instead of processing received payloads.
+* Fixed some bugs in the cdi_test application. Cdi_test skipped the payload data check for some configurations, it did
+  not terminate with an error code for some Rx payload errors, and it incorrectly skipped some Rx checks with pattern
+  type NONE.
+* Fixed a bug in statistics gathering and the cdi_test application if wait time value wraps, causing a hang (very long
+  sleep).
+* Fixed bugs in the multiline logger API that may cause applications to crash when multiline loggers are disabled.
+* Fixed a bug in CdiAvmRegisterBaselineProfile. The fix prevents registration of already registered baseline profiles.
+
+---------------------------------------------------------------------------
+CDI (Cloud Digital Interface) SDK Version 2.3.0 - 08/30/21
+---------------------------------------------------------------------------
+
+What's New
+------------
+
+* When creating connections, added ability to share a single poll thread across multiple connections. This can be
+  used to reduce CPU core usage. The thread must have enough bandwidth to service all connections associated with it.
+   * See shared_thread_id, which has been added to the CdiTxConfigData and CdiRxConfigData structures. NOTE: Use zero or
+     a negative value (ie. -1) to disable this feature and create a unique poll thread that is associated only with the
+     connection being created.
+   * Added new command line options to the cdi_test application. See "-tc" or "--thread_conn".
+   * When using more than 6 multiple connections, depending on payload size and available memory, you may have to reduce
+     the size defined by MAX_RX_PACKETS_PER_CONNECTION. For Linux, you can also increase the number of available
+     hugepages from a default value of 1024 by modifying /etc/sysctl.conf to contain 2048 or higher as shown below. Must
+     then use "sudo sysctl -p".
+     vm.nr_hugepages = 2048
+
+Bug Fixes
+------------
+* Removed macro NANOSECONDS_PER_SECOND from header cdi_utility_api.h.
+* Added prefix CDI_ or Cdi to various macros and symbols in headers cdi_utility_api.h, cdi_core_api.h, cdi_logger_api.h,
+  cdi_queue_api.h, and cdi_test_unit_api.h.
+* Updated code for AVM baseline profiles to match published specifications concerning use of semicolons. The values
+  generated by CdiAvmMakeBaselineConfiguration() for video width and height were separated by a comma instead of a
+  semicolon. For example: "width=1920, height=1080;" will now be generated as "width=1920; height=1080;".
+* Updated code for GetAvmBaselineUnitSize() which was reporting incorrect unit sizes for audio and ancillary media
+  profiles. In previous versions GetAvmBaselineUnitSize() returned the number of bytes instead of the number of bits.
+
+---------------------------------------------------------------------------
+CDI (Cloud Digital Interface) SDK Version 2.2.0 - 05/19/2021
+---------------------------------------------------------------------------
+
+What's New
+------------
+
+* Changed protocol version to 2.1 (CDI_PROTOCOL_VERSION.CDI_PROTOCOL_MAJOR_VERSION) and added new probe protocol
+  version 4 (CDI_PROBE_VERSION) to support bidirectional sockets used by probe control interface.
+* Added new OS APIs for sockets. See CdiOsSocketGetSockAddrIn(), CdiOsSocketReadFrom() and CdiOsSocketWriteTo().
+* Using bidirectional sockets for the out-of-band probe control interface. A single socket is used for each
+  connection. Compatibility with previous versions of the probe control interface is maintained.
+* Added "CDI_" prefix to defines and types in cdi_os_api.h to prevent name collisions with application code.
+* Added support for AVM connections that contain multiple endpoints. They can be used to demux and mux video, audio and
+  ancillary data streams. Changes include:
+   * New documentation and diagrams. See include/cdi_avm_api.h.
+   * New AVM APIs. See CdiAvmTxStreamConnectionCreate(), CdiAvmTxStreamEndpointCreate() and CdiAvmEndpointTxPayload().
+   * Removed stream_identifier from CdiTxConfigDataStream structure. See include/cdi_avm_api.h.
+   * Removed stream_identifier from CdiCoreConnectionCbData structure. Added remote_ip_str and remote_dest_port. See
+     include/cdi_core_api.h.
+   * Added new command line options to the cdi_test application. See "-XS" or "--new_conns".
+* Added payload transfer start time. It is available in the CdiAvmRxCbData/CdiRawRxCbData structure parameter passed to
+  the Rx payload application callbacks. See CdiCoreCbData, tx_start_time_microseconds in include/cdi_core_api.h.
+* Added new CdiCoreNetworkAdapterDestroy() API. This allows dynamic destruction of resources created by
+  CdiCoreNetworkAdapterInitialize(). Before using CdiCoreNetworkAdapterDestroy(), must ensure all connections using the
+  adapter are closed. See CdiCoreConnectionDestroy(). Also, all connections and adapters must be closed/destroyed before
+  using CdiCoreShutdown().
+* Added internal reference count to Logger state data. NOTE: Each time CdiLoggerInitialize() is called,
+  CdiLoggerShutdown() must be called once. The test applications have been updated to call CdiLoggerShutdown().
+* Added support for additional internal transport layer protocols. See new types/APIs in cdi/src/protocol.h.
+   * Protocol version has been added to the application connection callback data. See negotiated_... in
+     CdiCoreConnectionCbData in include/cdi_core_api.h.
+   * CDI_PROTOCOL_MAJOR_VERSION has been replaced with CDI_PROBE_VERSION.
+   * Supports previous protocol/probe version. See cdi/src/protocol_v1.c.
+   * New protocol/probe version 2.0.3. Contains the new probe command kProbeStateSendProtocolVersion, used to negotiate
+     a compatible version between local and remote endpoints. Protocol and probe data structure differences are
+     described in cdi/src/protocol_v2.c.
+* Fixed two values in video baseline profile for TCS ("ST2065-1", "ST428-1") and colorimetry ("ST2065-1", "ST2065-3")
+  that improperly had underscores rather than hyphens. This change brings the implementation in line with the
+  specifications (ST 2110-20, -30). A calculated risk assessment has been made to not follow the normal process of
+  incrementing the API version number. While this does introduce an unhandled incompatibility, the likelihood of this
+  affecting actual workflows was deemed to be insignificant.
+
+Bug Fixes
+------------
+
+* Fixed problems with multiple calls to CdiCoreInitialize(). See https://github.com/aws/aws-cdi-sdk/issues/34
+
+---------------------------------------------------------------------------
+CDI (Cloud Digital Interface) SDK Version 2.0.2 - 01/08/2021
+---------------------------------------------------------------------------
+
+What's New
+------------
+
+* Added initial version of the SDK coding style guide. See CODE_STYLE_GUIDE.md.
+* Replaced CdiLoggerSetGlobalLog() API with new CdiLogGlobalGet() API, which returns the global log handle created
+  via CdiCoreInitialize() API. The deprecated API did not serve any functional purpose.
+* Added Windows targets for generating DLLs for the CDI-AWS SDK library. See use of Debug_DLL and Release_DLL in the
+  Visual Studio solution and project files. Details at: https://github.com/aws/aws-cdi-sdk/pull/26
+* Added use of the CDI_INTERFACE define to APIs that were not previously using it. Only affects the new Windows DLL
+  targets.
+* When using CdiOsMemAllocHugePage() API on Linux, the size of bytes allocated must be a multiple of
+  CDI_HUGE_PAGES_BYTE_SIZE. See definition in cdi_os_api.h. If not, the memory will not be freed when using the
+  CdiOsMemFreeHugePage() API.
+* Renamed the queue type kQueueMultipleWriters to kQueueMultipleWritersFlag to clarify that the value is a flag,
+  not an OS signal type. See include/cdi_queue_api.h.
+* Added defines to uniquely identify the CDI transport protocol used by the SDK. See the CDI_PROTOCOL_VERSION,
+  CDI_PROTOCOL_MAJOR_VERSION and CDI_PROTOCOL_MINOR_VERSION in include/cdi_core_api.h.
+
+Bug Fixes
+------------
+
+* Fixed a problem in RxPollFreeBuffer() that could lead to an assert (segfault in debug build) in CdiListRemove() when
+  trying to remove an entry from an empty list.
+* Fixed a Rx adapter buffer memory leak when using the CdiCoreRxFreeBuffer() API from multiple threads.
+* Fixed a segfault when using the CdiLoggerMultilineEnd() API from multiple threads.
+* Fixed a segfault in the Windows variant when logging to stdout and stdout did not exist. The global logger created
+  via CdiCoreInitialize() API is now used instead of stdout. Details at: https://github.com/aws/aws-cdi-sdk/pull/25
+* Fixed problem with Linux Makefile that could cause the AWS-SDK to always partially re-build on Linux.
+
+---------------------------------------------------------------------------
+CDI (Cloud Digital Interface) SDK Version 2.0.0 - 12/14/2020
+---------------------------------------------------------------------------
+
+What's New
+------------
+* Documentation updates.
+* Added support for additional AVM baseline profiles. See new types/APIs in include/baseline_profile_api.h.
+* Added AVM Baseline profile 2.00.
+* Added configuration settings to the following structures:
+   * CdiTxConfigData: Added max_simultaneous_tx_payloads and max_simultaneous_tx_payload_sgl_entries.
+   * CdiRxConfigData: Added max_simultaneous_rx_payloads_per_connection.
+   These settings were previously statically defined. To use the static values, set these to zero. NOTE. Use memset or a
+   zero structure initializer (= {0}) to set the whole structure to zero before setting the desired members to the
+   actual values required.
+* Added new core utility APIs for getting TAI time. See CdiCoreGetPtpTimestamp() and CdiCoreGetTaiTimeMicroseconds().
+* Added new OS types and APIs for using statically allocated mutexes. See CdiStaticMutexType,
+  CDI_STATIC_MUTEX_INITIALIZER, CdiOsStaticMutexLock() and CdiOsStaticMutexUnlock().
+* Added new OS portable type for use by the CdiOsSocket...() APIs to hold socket instance data (ie. port number). This
+  was done so the transmit side socket no longer has to call connect(), thus preventing failed sends due to ICMP port
+  unreachable responses. See CdiSocket.
+* Moved the Logger to the public API. Header file is located at include/cdi_logger_api.h.
+* Moved the Queue to the public API. Header file is located at include/cdi_queue_api.h. Also, added support for multiple
+  writers. See the new types kQueueSignalModeMask and kQueueMultipleWriters.
+* Added new OS portable type for converting between nanoseconds and seconds. See NANOSECONDS_PER_SECOND.
+* Added number of bytes transferred to statistics. See num_bytes_transferred in cdi_core_api.h and BytesTransferred in
+  cloudwatch_sdk_metrics.cpp.
+
+Bug Fixes
+------------
+* Several connection related issues and segfaults as described in published GitHub issues.
+
+Known Issues
+------------
+
+Please refer to the README.md file for a complete list of known issues.
+
+---------------------------------------------------------------------------
+CDI (Cloud Digital Interface) SDK Version 1.0.0 - 09/15/2020
+---------------------------------------------------------------------------
+
+What's New
+------------
+Initial release of the SDK.
+
+Bug Fixes
+------------
+
+Known Issues
+------------
+
+Please refer to the README.md file for a complete list of known issues.

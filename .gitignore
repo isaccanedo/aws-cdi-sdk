@@ -1,0 +1,13 @@
+/cmake_build/
+/bin/
+/build/
+/.history/
+*.vpwhistu
+*.vtg
+*.swp
+*.pyc
+.idea/
+/aws-cpp-sdk-cdi/out/
+
+#Visual Studio Ignores
+/.vs
