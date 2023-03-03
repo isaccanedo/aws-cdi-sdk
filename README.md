@@ -65,7 +65,7 @@ O AWS Cloud Digital Interface (CDI) Software Development Kit (SDK) é um conjunt
 
 # Visão Geral
 
-For time-sensitive data transmission of uncompressed live video, latency and quality must be optimized.  Historically this type of video workload was built on-premises using Serial Digital Interface (SDI) connections or with dedicated IP networks.
+Para transmissão de dados sensíveis ao tempo de vídeo ao vivo não compactado, a latência e a qualidade devem ser otimizadas.  Historically this type of video workload was built on-premises using Serial Digital Interface (SDI) connections or with dedicated IP networks.
 
 The AWS CDI SDK is designed to enable you to deploy live uncompressed video solutions in the AWS Cloud through the reliable transmission of blocks of data between Elastic Fabric Adapter (EFA) enabled Amazon EC2 instances.
 
