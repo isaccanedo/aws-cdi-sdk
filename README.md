@@ -65,7 +65,7 @@ Novas informações
 
 ---
 
-# Overview
+# Visão Geral
 
 For time-sensitive data transmission of uncompressed live video, latency and quality must be optimized.  Historically this type of video workload was built on-premises using Serial Digital Interface (SDI) connections or with dedicated IP networks.
 
