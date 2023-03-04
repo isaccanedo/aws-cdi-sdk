@@ -2,6 +2,8 @@
 
 O AWS Cloud Digital Interface (CDI) Software Development Kit (SDK) é um conjunto de bibliotecas e documentação para você criar soluções de vídeo ao vivo na AWS. O AWS CDI SDK fornece acesso ao desempenho de rede, confiabilidade e recursos de vídeo não compactados necessários para criar aplicativos, incluindo reprodução de canal de TV, comutação de produção de vídeo ao vivo, inserção de gráfico de movimento, multivisualizadores, taxa de quadros de vídeo e conversão de espaço de cor, marca d'água forense, e decodificação e codificação de vídeo. Se você estiver desenvolvendo um aplicativo de vídeo ao vivo distribuído que é executado em várias instâncias de computação, integrar o AWS CDI SDK ao seu aplicativo de software pode fornecer as ferramentas e o desempenho de que você precisa. O AWS CDI SDK contém bibliotecas que podem ser facilmente integradas ao seu aplicativo.
 
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
 ---
 
 - [AWS CDI SDK](#aws-cdi-sdk)
